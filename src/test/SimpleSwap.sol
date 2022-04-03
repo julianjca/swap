@@ -50,11 +50,39 @@ contract ContractTest is DSTest {
         assertEq(simpleERC721NFTContract.balanceOf(bob), 5);
     }
 
-    function testCreateSwap() public {
+    function testCreateNoValueSwap() public {
         vm.prank(alice);
 
         NFTStruct[] memory offeredNFT;
         NFTStruct[] memory counterPartyNFT;
+
+        swapContract.createSwap{value: 0 ether}(
+            bob,
+            0,
+            offeredNFT,
+            counterPartyNFT
+        );
+
+        // check if it's created
+        assertEq(swapContract.getSwaps(alice).length, 1);
+        assertEq(swapContract.getSwaps(bob).length, 1);
+    }
+
+    function testCreateSwap1() public {
+        vm.prank(alice);
+
+        NFTStruct[] memory offeredNFT;
+        NFTStruct[] memory counterPartyNFT = new NFTStruct[](1);
+
+        uint256[] memory tokenIDs = new uint256[](3);
+        tokenIDs[0] = 8;
+        tokenIDs[1] = 9;
+        tokenIDs[2] = 10;
+
+        counterPartyNFT[0] = NFTStruct(
+            address(simpleERC721NFTContract),
+            tokenIDs
+        );
 
         swapContract.createSwap{value: 0 ether}(
             bob,

@@ -48,6 +48,22 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
         return swaps[userAddress];
     }
 
+    function getOfferedNFT(uint256 id)
+        external
+        view
+        returns (NFTStruct[] memory)
+    {
+        return offeredNFT[id];
+    }
+
+    function getCounterPartyNFT(uint256 id)
+        external
+        view
+        returns (NFTStruct[] memory)
+    {
+        return counterPartyNFT[id];
+    }
+
     function createSwap(
         address counterParty,
         uint256 counterPartyEtherValue,
