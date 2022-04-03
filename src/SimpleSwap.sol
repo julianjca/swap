@@ -5,6 +5,8 @@ import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 import {ERC1155TokenReceiver} from "solmate/tokens/ERC1155.sol";
 
 contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
+    uint256 public swapCount;
+
     enum SwapStatus {
         Opened,
         Closed,
@@ -19,16 +21,44 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
     struct Swap {
         uint256 id;
         address payable addressOne;
-        NFTStruct[] nftOne;
+        // NFTStruct[] nftOne;
         uint256 valueOne;
         address payable addressTwo;
         uint256 valueTwo;
-        NFTStruct[] nftTwo;
+        // NFTStruct[] nftTwo;
         uint256 swapCreated;
-        SwapStatus status;
+        // SwapStatus status;
     }
 
     mapping(address => Swap[]) public swaps;
+
+    function getSwaps(address userAddress)
+        external
+        view
+        returns (Swap[] memory)
+    {
+        return swaps[userAddress];
+    }
+
+    function createSwap(address counterParty, uint256 counterPartyEtherValue)
+        external
+        payable
+    {
+        address addressOne = msg.sender;
+        address addressTwo = counterParty;
+
+        Swap memory swap = Swap(
+            swapCount++,
+            payable(addressOne),
+            msg.value,
+            payable(addressTwo),
+            counterPartyEtherValue,
+            block.timestamp
+        );
+
+        swaps[msg.sender].push(swap);
+        swaps[counterParty].push(swap);
+    }
 
     //Interface IERC721/IERC1155
     function onERC721Received(
