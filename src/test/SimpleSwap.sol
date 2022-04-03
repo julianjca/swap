@@ -40,8 +40,11 @@ contract ContractTest is DSTest {
         // mint for alice and bob
         vm.prank(alice);
         simpleERC721NFTContract.mint{value: 0 ether}(5);
+        simpleERC721NFTContract.setApprovalForAll(address(swapContract), true);
+
         vm.prank(bob);
         simpleERC721NFTContract.mint{value: 0 ether}(5);
+        simpleERC721NFTContract.setApprovalForAll(address(swapContract), true);
 
         assertEq(simpleERC721NFTContract.balanceOf(alice), 5);
         assertEq(simpleERC721NFTContract.balanceOf(bob), 5);
