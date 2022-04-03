@@ -94,5 +94,10 @@ contract ContractTest is DSTest {
         // check if it's created
         assertEq(swapContract.getSwaps(alice).length, 1);
         assertEq(swapContract.getSwaps(bob).length, 1);
+
+        NFTStruct[] memory cp = swapContract.getCounterPartyNFT(0);
+
+        assertEq(cp[0].tokenContract, address(simpleERC721NFTContract));
+        assertEq(cp[0].tokenId.length, 3);
     }
 }
