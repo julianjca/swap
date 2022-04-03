@@ -7,8 +7,16 @@ import {ERC1155TokenReceiver} from "solmate/tokens/ERC1155.sol";
 contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
     uint256 public swapCount;
 
+    event SwapCreated(
+        address indexed _creator,
+        uint256 indexed _time,
+        SwapStatus indexed _status,
+        uint256 _swapId,
+        address _counterPart
+    );
+
     enum SwapStatus {
-        Opened,
+        Open,
         Closed,
         Cancelled
     }
@@ -27,7 +35,7 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
         uint256 valueTwo;
         // NFTStruct[] nftTwo;
         uint256 swapCreated;
-        // SwapStatus status;
+        SwapStatus status;
     }
 
     mapping(address => Swap[]) public swaps;
@@ -47,17 +55,32 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
         address addressOne = msg.sender;
         address addressTwo = counterParty;
 
+        uint256 swapId = swapCount;
+
         Swap memory swap = Swap(
-            swapCount++,
+            swapId,
             payable(addressOne),
             msg.value,
             payable(addressTwo),
             counterPartyEtherValue,
-            block.timestamp
+            block.timestamp,
+            SwapStatus.Open
         );
 
         swaps[msg.sender].push(swap);
         swaps[counterParty].push(swap);
+
+        unchecked {
+            swapCount++;
+        }
+
+        emit SwapCreated(
+            addressOne,
+            block.timestamp,
+            SwapStatus.Open,
+            swapId,
+            addressTwo
+        );
     }
 
     //Interface IERC721/IERC1155
