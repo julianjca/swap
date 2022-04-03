@@ -6,7 +6,7 @@ import {Utilities} from "./utils/Utilities.sol";
 import {console} from "./utils/Console.sol";
 import {Vm} from "forge-std/Vm.sol";
 
-import {SimpleSwap} from "../SimpleSwap.sol";
+import {SimpleSwap, NFTStruct} from "../SimpleSwap.sol";
 
 contract ContractTest is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
@@ -34,7 +34,15 @@ contract ContractTest is DSTest {
     function testCreateSwap() public {
         vm.prank(alice);
 
-        swapContract.createSwap{value: 0 ether}(bob, 0);
+        NFTStruct[] memory offeredNFT;
+        NFTStruct[] memory counterPartyNFT;
+
+        swapContract.createSwap{value: 0 ether}(
+            bob,
+            0,
+            offeredNFT,
+            counterPartyNFT
+        );
 
         // check if it's created
         assertEq(swapContract.getSwaps(alice).length, 1);
