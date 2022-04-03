@@ -5,8 +5,6 @@ import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
 import {ERC1155TokenReceiver} from "solmate/tokens/ERC1155.sol";
 
 contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
-    string public greet = "Hello World!";
-
     //Interface IERC721/IERC1155
     function onERC721Received(
         address operator,
