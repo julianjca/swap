@@ -97,6 +97,7 @@ contract ContractTest is DSTest {
 
         NFTStruct[] memory cp = swapContract.getCounterPartyNFT(0);
 
+        // check the struct created
         assertEq(cp[0].tokenContract, address(simpleERC721NFTContract));
         assertEq(cp[0].tokenId.length, 3);
     }
