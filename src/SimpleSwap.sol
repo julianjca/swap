@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity >=0.8.0;
 
-import {ERC721TokenReceiver} from "solmate/tokens/ERC721.sol";
+import {ERC721TokenReceiver, ERC721} from "solmate/tokens/ERC721.sol";
 import {ERC1155TokenReceiver} from "solmate/tokens/ERC1155.sol";
 
 struct NFTStruct {
@@ -37,6 +37,7 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
     }
 
     mapping(address => Swap[]) public swaps;
+    mapping(uint256 => uint256) public swapsMatcher;
     mapping(uint256 => NFTStruct[]) public offeredNFT;
     mapping(uint256 => NFTStruct[]) public counterPartyNFT;
 
@@ -89,9 +90,21 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
 
         swaps[msg.sender].push(swap);
         swaps[counterParty].push(swap);
+        swapsMatcher[swapId] = swaps[msg.sender].length;
 
         for (uint256 index = 0; index < offeredNFTLength; index++) {
             offeredNFT[swapId].push(_offeredNFT[index]);
+
+            uint256 idsLength = _offeredNFT[index].tokenId.length;
+
+            // transfer all NFT to this contract
+            for (uint256 k = 0; k < idsLength; k++) {
+                ERC721(_offeredNFT[index].tokenContract).safeTransferFrom(
+                    msg.sender,
+                    address(this),
+                    _offeredNFT[index].tokenId[k]
+                );
+            }
         }
 
         for (uint256 index = 0; index < counterPartyNFTLength; index++) {
@@ -109,6 +122,13 @@ contract SimpleSwap is ERC721TokenReceiver, ERC1155TokenReceiver {
             swapId,
             addressTwo
         );
+    }
+
+    function executeSwap(uint256 id, address creator) external {
+        Swap memory swap = swaps[creator][swapsMatcher[id]];
+
+        require(swap.addressTwo == msg.sender, "You are not the counterparty.");
+        require(swap.status == SwapStatus.Open, "Swap is not open.");
     }
 
     //Interface IERC721/IERC1155
