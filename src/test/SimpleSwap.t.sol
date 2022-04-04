@@ -111,8 +111,6 @@ contract ContractTest is DSTest {
         // check the struct created
         assertEq(cp[0].tokenContract, address(simpleERC721NFTContract));
         assertEq(cp[0].tokenId.length, 3);
-
-        // assertEq(simpleERC721NFTContract.balanceOf(address(this)), 3);
     }
 
     function testCreateSwap2() public {
